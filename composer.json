@@ -1,0 +1,19 @@
+{
+    "name": "pcore/http-message",
+    "type": "library",
+    "homepage": "https://github.com/pcore-framework/http-message",
+    "authors": [
+        {
+            "name": "Magomedcoder",
+            "email": "info@magomedcoder.ru"
+        }
+    ],
+    "require": {
+        "php": "^8.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "PCore\\HttpMessage\\": "src/"
+        }
+    }
+}
