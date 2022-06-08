@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace PCore\HttpMessage;
 
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\StreamInterface;
-use Psr\Http\Message\UriInterface;
+use PCore\HttpMessage\Bags\HeaderBag;
+use Psr\Http\Message\{RequestInterface, StreamInterface, UriInterface};
 
 /**
  * Class Request
@@ -29,7 +28,7 @@ class Request extends Message implements RequestInterface
     {
         $this->uri = $uri instanceof UriInterface ? $uri : new Uri($uri);
         $this->formatBody($body);
-        $this->formatHeaders($headers);
+        $this->headers = new HeaderBag($headers);
     }
 
     /**
@@ -48,8 +47,12 @@ class Request extends Message implements RequestInterface
      */
     public function withRequestTarget($requestTarget)
     {
-        $this->requestTarget = $requestTarget;
-        return $this;
+        if ($requestTarget === $this->requestTarget) {
+            return $this;
+        }
+        $new = clone $this;
+        $new->requestTarget = $requestTarget;
+        return $new;
     }
 
     /**
@@ -65,8 +68,12 @@ class Request extends Message implements RequestInterface
      */
     public function withMethod($method)
     {
-        $this->method = $method;
-        return $this;
+        if ($method === $this->method) {
+            return $this;
+        }
+        $new = clone $this;
+        $new->method = $method;
+        return $new;
     }
 
     /**
@@ -82,11 +89,15 @@ class Request extends Message implements RequestInterface
      */
     public function withUri(UriInterface $uri, $preserveHost = false)
     {
+        if ($uri === $this->uri) {
+            return $this;
+        }
+        $new = clone $this;
         if (true === $preserveHost) {
             $uri = $uri->withHost($this->getHeaderLine('Host'));
         }
-        $this->uri = $uri;
-        return $this;
+        $new->uri = $uri;
+        return $new;
     }
 
 }

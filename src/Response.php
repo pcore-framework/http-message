@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace PCore\HttpMessage;
 
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\StreamInterface;
+use Psr\Http\Message\{ResponseInterface, StreamInterface};
 
 /**
  * Class Response

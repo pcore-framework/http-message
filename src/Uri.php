@@ -56,12 +56,9 @@ class Uri implements UriInterface
     protected string $userinfo = '';
 
     /**
-     * 默认端口
+     * Порт по умолчанию
      */
-    protected const DEFAULT_PORT = [
-        'https' => 443,
-        'http' => 80,
-    ];
+    protected const DEFAULT_PORT = ['https' => 443, 'http' => 80];
 
     /**
      * @param string $uri
@@ -175,8 +172,12 @@ class Uri implements UriInterface
      */
     public function withScheme($scheme)
     {
-        $this->scheme = $scheme;
-        return $this;
+        if ($scheme === $this->scheme) {
+            return $this;
+        }
+        $new = clone $this;
+        $new->scheme = $scheme;
+        return $new;
     }
 
     /**
@@ -184,8 +185,9 @@ class Uri implements UriInterface
      */
     public function withUserInfo($user, $password = null)
     {
-        $this->userinfo = sprintf('%s%s', $user, $password ? (':' . $password) : '');
-        return $this;
+        $new = clone $this;
+        $new->userinfo = sprintf('%s%s', $user, $password ? (':' . $password) : '');
+        return $new;
     }
 
     /**
@@ -193,8 +195,12 @@ class Uri implements UriInterface
      */
     public function withHost($host)
     {
-        $this->host = $host;
-        return $this;
+        if ($host === $this->host) {
+            return $this;
+        }
+        $new = clone $this;
+        $new->host = $host;
+        return $new;
     }
 
     /**
@@ -202,8 +208,12 @@ class Uri implements UriInterface
      */
     public function withPort($port)
     {
-        $this->port = $port;
-        return $this;
+        if ($port === $this->port) {
+            return $this;
+        }
+        $new = clone $this;
+        $new->port = $port;
+        return $new;
     }
 
     /**
@@ -211,8 +221,12 @@ class Uri implements UriInterface
      */
     public function withPath($path)
     {
-        $this->path = $path;
-        return $this;
+        if ($path === $this->path) {
+            return $this;
+        }
+        $new = clone $this;
+        $new->path = $path;
+        return $new;
     }
 
     /**
@@ -220,8 +234,12 @@ class Uri implements UriInterface
      */
     public function withQuery($query)
     {
-        $this->query = $query;
-        return $this;
+        if ($query === $this->query) {
+            return $this;
+        }
+        $new = clone $this;
+        $new->query = $query;
+        return $new;
     }
 
     /**
@@ -229,8 +247,12 @@ class Uri implements UriInterface
      */
     public function withFragment($fragment)
     {
-        $this->fragment = $fragment;
-        return $this;
+        if ($fragment === $this->fragment) {
+            return $this;
+        }
+        $new = clone $this;
+        $new->fragment = $fragment;
+        return $new;
     }
 
     /**
@@ -257,7 +279,7 @@ class Uri implements UriInterface
             $this->getPortString(),
             $this->getPath(),
             ('' === $this->query) ? '' : ('?' . $this->query),
-            ('' === $this->fragment) ? '' : ('#' . $this->fragment)
+            ('' === $this->fragment) ? '' : ('#' . $this->fragment),
         );
     }
 
