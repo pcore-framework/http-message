@@ -1,6 +1,7 @@
 {
     "name": "pcore/http-message",
     "type": "library",
+    "license": "MIT",
     "homepage": "https://github.com/pcore-framework/http-message",
     "authors": [
         {

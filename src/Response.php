@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace PCore\HttpMessage;
 
+use PCore\HttpMessage\Bags\HeaderBag;
 use Psr\Http\Message\{ResponseInterface, StreamInterface};
 
 /**
@@ -86,7 +87,7 @@ class Response extends Message implements ResponseInterface
     {
         $this->reasonPhrase = static::PHRASES[$status] ?? '';
         $this->formatBody($body);
-        $this->formatHeaders($headers);
+        $this->headers = new HeaderBag($headers);
     }
 
     /**
@@ -102,9 +103,13 @@ class Response extends Message implements ResponseInterface
      */
     public function withStatus($code, $reasonPhrase = '')
     {
-        $this->status = $code;
-        $this->reasonPhrase = $reasonPhrase ?: (self::PHRASES[$code] ?? '');
-        return $this;
+        if ($code === $this->status) {
+            return $this;
+        }
+        $new = clone $this;
+        $new->status = $code;
+        $new->reasonPhrase = $reasonPhrase ?: (self::PHRASES[$code] ?? '');
+        return $new;
     }
 
     /**
