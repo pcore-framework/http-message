@@ -1,269 +1,171 @@
 <?php
 
-declare(strict_types=1);
-
 namespace PCore\HttpMessage;
 
-use PCore\HttpMessage\Stream\StringStream;
-use Psr\Http\Message\{ServerRequestInterface, StreamInterface, UriInterface};
-use PCore\HttpMessage\Bags\{CookieBag, FileBag, ParameterBag, ServerBag};
-
-use function strpos;
+use PCore\Utils\Arr;
+use Swoole\Http\Response;
 
 /**
  * Class ServerRequest
  * @package PCore\HttpMessage
  * @github https://github.com/pcore-framework/http-message
  */
-class ServerRequest extends Request implements ServerRequestInterface
+class ServerRequest extends BaseServerRequest
 {
 
-    protected ServerBag $serverParams;
-    protected ParameterBag $cookieParams;
-    protected ParameterBag $queryParams;
-    protected ParameterBag $attributes;
-    protected FileBag $uploadedFiles;
-    protected ParameterBag $parsedBody;
-
-    public function __construct(
-        string $method,
-        UriInterface|string $uri,
-        array $headers = [],
-        StreamInterface|string|null $body = null,
-        string $protocolVersion = '1.1'
-    )
+    /**
+     * @param string $name
+     * @return string
+     */
+    public function header(string $name): string
     {
-        parent::__construct($method, $uri, $headers, $body, $protocolVersion);
-        $this->attributes = new ParameterBag();
-        $this->queryParams = new ParameterBag();
-        $this->uploadedFiles = new FileBag();
-        $this->parsedBody = new ParameterBag();
-        $this->serverParams = new ServerBag();
+        return $this->getHeaderLine($name);
     }
 
     /**
-     * @param \Swoole\Http\Request $request
-     * @return static
+     * @param string $name
+     * @return ?string
      */
-    public static function createFromSwooleRequest($request, array $attributes = []): ServerRequest
+    public function server(string $name): ?string
     {
-        $server = $request->server;
-        $header = $request->header;
-        $uri = (new Uri())->withScheme(isset($server['https']) && $server['https'] !== 'off' ? 'https' : 'http');
-        $hasPort = false;
-        if (isset($server['http_host'])) {
-            $hostHeaderParts = explode(':', $server['http_host']);
-            $uri = $uri->withHost($hostHeaderParts[0]);
-            if (isset($hostHeaderParts[1])) {
-                $hasPort = true;
-                $uri = $uri->withPort($hostHeaderParts[1]);
+        return $this->getServerParams()[strtoupper($name)] ?? null;
+    }
+
+    /**
+     * @param string $method
+     * @return bool
+     */
+    public function isMethod(string $method): bool
+    {
+        return 0 === strcasecmp($this->getMethod(), $method);
+    }
+
+    /**
+     * @return string
+     */
+    public function url(): string
+    {
+        return $this->getUri()->__toString();
+    }
+
+    /**
+     * @param string $name
+     * @return string|null
+     */
+    public function cookie(string $name): ?string
+    {
+        return $this->getCookieParams()[strtoupper($name)] ?? null;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAjax(): bool
+    {
+        return 0 === strcasecmp('XMLHttpRequest', $this->getHeaderLine('X-REQUESTED-WITH'));
+    }
+
+    /**
+     * @param string $path
+     * @return bool
+     */
+    public function isPath(string $path): bool
+    {
+        $requestPath = $this->getUri()->getPath();
+        return 0 === strcasecmp($requestPath, $path) || preg_match("#^{$path}$#iU", $requestPath);
+    }
+
+    /**
+     * @return string
+     */
+    public function raw(): string
+    {
+        return $this->getBody()->getContents();
+    }
+
+    /**
+     * @param array|string|null $key
+     * @param mixed|null $default
+     * @return mixed
+     */
+    public function get(null|array|string $key = null, mixed $default = null): mixed
+    {
+        return $this->input($key, $default, $this->getQueryParams());
+    }
+
+    /**
+     * @param array|string|null $key
+     * @param mixed|null $default
+     * @return mixed
+     */
+    public function post(null|array|string $key = null, mixed $default = null): mixed
+    {
+        return $this->input($key, $default, $this->getParsedBody());
+    }
+
+    /**
+     * @param array|string|null $key
+     * @param mixed|null $default
+     * @param array|null $from
+     * @return mixed
+     */
+    public function input(null|array|string $key = null, mixed $default = null, ?array $from = null): mixed
+    {
+        $from ??= $this->all();
+        if (is_null($key)) {
+            return $from ?? [];
+        }
+        if (is_array($key)) {
+            $return = [];
+            foreach ($key as $value) {
+                $return[$value] = $this->isEmpty($from, $value) ? ($default[$value] ?? null) : $from[$value];
             }
-        } else if (isset($server['server_name'])) {
-            $uri = $uri->withHost($server['server_name']);
-        } else if (isset($server['server_addr'])) {
-            $uri = $uri->withHost($server['server_addr']);
-        } else if (isset($header['host'])) {
-            $hasPort = true;
-            if (strpos($header['host'], ':')) {
-                [$host, $port] = explode(':', $header['host'], 2);
-                if ($port != $uri->getDefaultPort()) {
-                    $uri = $uri->withPort($port);
-                }
-            } else {
-                $host = $header['host'];
-            }
-            $uri = $uri->withHost($host);
+            return $return;
         }
-        if (!$hasPort && isset($server['server_port'])) {
-            $uri = $uri->withPort($server['server_port']);
-        }
-        $hasQuery = false;
-        if (isset($server['request_uri'])) {
-            $requestUriParts = explode('?', $server['request_uri']);
-            $uri = $uri->withPath($requestUriParts[0]);
-            if (isset($requestUriParts[1])) {
-                $hasQuery = true;
-                $uri = $uri->withQuery($requestUriParts[1]);
-            }
-        }
-        if (!$hasQuery && isset($server['query_string'])) {
-            $uri = $uri->withQuery($server['query_string']);
-        }
-        $psrRequest = new static($request->getMethod(), $uri, $header);
-        $psrRequest->serverParams = new ServerBag($server);
-        $psrRequest->parsedBody = new ParameterBag($request->post ?? []);
-        $psrRequest->body = new StringStream($request->getContent());
-        $psrRequest->cookieParams = new CookieBag($request->cookie ?? []);
-        $psrRequest->queryParams = new ParameterBag($request->get ?? []);
-        $psrRequest->uploadedFiles = new FileBag($request->files ?? []);
-        $psrRequest->attributes    = new ParameterBag($attributes);
-        return $psrRequest;
+        return $this->isEmpty($from, $key) ? $default : $from[$key];
     }
 
     /**
-     * @param \Workerman\Protocols\Http\Request $request
-     * @param array
-     * @return static
+     * @param array $haystack
+     * @param $needle
+     * @return bool
      */
-    public static function createFromWorkermanRequest($request, array $attributes = []): static
+    protected function isEmpty(array $haystack, $needle): bool
     {
-        $psrRequest = new static(
-            $request->method(), new Uri($request->uri()),
-            $request->header(), $request->rawBody()
-        );
-        $psrRequest->queryParams = new ParameterBag($request->get() ?: []);
-        $psrRequest->parsedBody = new ParameterBag($request->post() ?: []);
-        $psrRequest->cookieParams = new ParameterBag($request->cookie());
-        $psrRequest->uploadedFiles = new FileBag($request->file());
-        $psrRequest->attributes    = new ParameterBag($attributes);
-        return $psrRequest;
+        return !isset($haystack[$needle]) || '' === $haystack[$needle];
     }
 
     /**
-     * @return static
+     * @return null|Response
      */
-    public static function createFromGlobals(): static
+    public function rawResponse()
     {
-        $psrRequest = new static(
-            $_SERVER['REQUEST_METHOD'],
-            new Uri($_SERVER['REQUEST_URI']),
-            apache_request_headers(),
-            file_get_contents('php://input')
-        );
-        $psrRequest->serverParams = new ServerBag($_SERVER);
-        $psrRequest->cookieParams = new ParameterBag($_COOKIE);
-        $psrRequest->queryParams = new ParameterBag($_GET);
-        $psrRequest->parsedBody = new ParameterBag($_POST);
-        $psrRequest->uploadedFiles = FileBag::createFromGlobal();
-        return $psrRequest;
+        return $this->getAttribute('rawResponse');
     }
 
     /**
-     * @inheritDoc
+     * @param string $field
+     * @return UploadedFile|null
      */
-    public function getServerParams()
+    public function file(string $field): ?UploadedFile
     {
-        return $this->serverParams;
+        return Arr::get($this->files(), $field);
     }
 
     /**
-     * @inheritDoc
+     * @return UploadedFile[]
      */
-    public function withServerParams(array $serverParams)
+    public function files(): array
     {
-        $new = clone $this;
-        $new->serverParams = new ServerBag($serverParams);
-        return $new;
+        return $this->getUploadedFiles();
     }
 
     /**
      * @return array
      */
-    public function getCookieParams()
+    public function all(): array
     {
-        return $this->cookieParams->all();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function withCookieParams(array $cookies)
-    {
-        $new = clone $this;
-        $new->cookieParams = new ParameterBag($cookies);
-        return $new;
-    }
-
-    /**
-     * @return array
-     */
-    public function getQueryParams()
-    {
-        return $this->queryParams->all();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function withQueryParams(array $query)
-    {
-        $new = clone $this;
-        $new->queryParams = $query;
-        return $new;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getUploadedFiles()
-    {
-        return $this->uploadedFiles->all();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function withUploadedFiles(array $uploadedFiles)
-    {
-        $new = clone $this;
-        $new->uploadedFiles = $uploadedFiles;
-        return $new;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getParsedBody()
-    {
-        return $this->parsedBody->all();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function withParsedBody($data)
-    {
-        $new = clone $this;
-        $new->parsedBody = $data instanceof ParameterBag ? $data : new ParameterBag((array)$data);
-        return $new;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getAttributes()
-    {
-        return $this->attributes->all();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getAttribute($name, $default = null)
-    {
-        return $this->attributes->get($name, $default);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function withAttribute($name, $value)
-    {
-        $new = clone $this;
-        $new->attributes = clone $this->attributes;
-        $new->attributes->set($name, $value);
-        return $new;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function withoutAttribute($name)
-    {
-        $new = clone $this;
-        $new->attributes = clone $this->attributes;
-        $new->attributes->remove($name);
-        return $new;
+        return $this->getParsedBody() + $this->getParsedBody();
     }
 
 }

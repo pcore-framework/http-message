@@ -17,5 +17,8 @@
         "psr-4": {
             "PCore\\HttpMessage\\": "src/"
         }
+    },
+    "suggest": {
+        "pcore/utils": "Требуется utils."
     }
 }
