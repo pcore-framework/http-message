@@ -2,8 +2,7 @@
 
 namespace PCore\HttpMessage;
 
-use PCore\HttpMessage\Stream\StringStream;
-use Psr\Http\Message\{ResponseInterface, StreamInterface};
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * Class Response
@@ -13,18 +12,13 @@ use Psr\Http\Message\{ResponseInterface, StreamInterface};
 class Response extends BaseResponse
 {
 
-    public function json($data, int $status = 200): ResponseInterface
+    public static function json($data, int $status = 200): ResponseInterface
     {
-        return $this->withHeader('Content-Type', 'application/json; charset=utf-8')
-            ->end(json_encode($data), $status);
-    }
-
-    public function end(null|StreamInterface|string $data = null, int $status = 200): ResponseInterface
-    {
-        return $this->withStatus($status)
-            ->withBody($data instanceof StreamInterface
-                ? $data
-                : new StringStream((string)$data));
+        return new static(
+            $status,
+            ['Content-Type' => 'application/json; charset=utf-8'],
+            json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
+        );
     }
 
 }
