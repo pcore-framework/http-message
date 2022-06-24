@@ -19,7 +19,7 @@ class BaseServerRequest extends Request implements ServerRequestInterface
 {
 
     protected ServerBag $serverParams;
-    protected ParameterBag $cookieParams;
+    protected CookieBag $cookieParams;
     protected ParameterBag $queryParams;
     protected ParameterBag $attributes;
     protected FileBag $uploadedFiles;
@@ -113,7 +113,7 @@ class BaseServerRequest extends Request implements ServerRequestInterface
         );
         $psrRequest->queryParams = new ParameterBag($request->get() ?: []);
         $psrRequest->parsedBody = new ParameterBag($request->post() ?: []);
-        $psrRequest->cookieParams = new ParameterBag($request->cookie());
+        $psrRequest->cookieParams = new CookieBag($request->cookie());
         $psrRequest->uploadedFiles = new FileBag($request->file());
         $psrRequest->attributes    = new ParameterBag($attributes);
         return $psrRequest;
@@ -131,7 +131,7 @@ class BaseServerRequest extends Request implements ServerRequestInterface
             file_get_contents('php://input')
         );
         $psrRequest->serverParams = new ServerBag($_SERVER);
-        $psrRequest->cookieParams = new ParameterBag($_COOKIE);
+        $psrRequest->cookieParams = new CookieBag($_COOKIE);
         $psrRequest->queryParams = new ParameterBag($_GET);
         $psrRequest->parsedBody = new ParameterBag($_POST);
         $psrRequest->uploadedFiles = FileBag::createFromGlobal();
@@ -170,7 +170,7 @@ class BaseServerRequest extends Request implements ServerRequestInterface
     public function withCookieParams(array $cookies)
     {
         $new = clone $this;
-        $new->cookieParams = new ParameterBag($cookies);
+        $new->cookieParams = new CookieBag($cookies);
         return $new;
     }
 

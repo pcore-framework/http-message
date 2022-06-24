@@ -10,6 +10,8 @@ namespace PCore\HttpMessage\Bags;
 class CaseInsensitiveBag extends ParameterBag
 {
 
+    protected array $map = [];
+
     /**
      * @param array $parameters
      * @return void
@@ -17,6 +19,7 @@ class CaseInsensitiveBag extends ParameterBag
     public function replace(array $parameters = [])
     {
         $this->parameters = array_change_key_case($parameters, CASE_UPPER);
+        $this->map = array_combine(array_keys($this->parameters), $parameters);
     }
 
     /**

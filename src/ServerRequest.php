@@ -2,8 +2,10 @@
 
 namespace PCore\HttpMessage;
 
+use Exception;
 use PCore\Utils\Arr;
 use Swoole\Http\Response;
+use PCore\Session\Session;
 
 /**
  * Class ServerRequest
@@ -165,7 +167,28 @@ class ServerRequest extends BaseServerRequest
      */
     public function all(): array
     {
-        return $this->getParsedBody() + $this->getParsedBody();
+        return $this->getQueryParams() + $this->getParsedBody();
+    }
+
+    /**
+     * @return ?Session
+     */
+    public function session(): ?Session
+    {
+        if ($session = $this->getAttribute('PCore\Session\Session')) {
+            return $session;
+        }
+        throw new RuntimeException('Сессия недействительна.');
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function CSRFToken(): string
+    {
+        $token = bin2hex(random_bytes(32));
+        $this->session()->set('_token', $token);
+        return $token;
     }
 
 }
