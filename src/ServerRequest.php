@@ -106,6 +106,22 @@ class ServerRequest extends BaseServerRequest
     }
 
     /**
+     * @param $request
+     * @param array $keys
+     * @param array|null $default
+     * @return array
+     */
+    public function inputs($request, array $keys, array $default = null): array
+    {
+        $data = json_decode($request->raw(), true);
+        $result = [];
+        foreach ($keys as $key) {
+            $result[$key] = data_get($data, $key, $default[$key] ?? null);
+        }
+        return $result;
+    }
+
+    /**
      * @param array|string|null $key
      * @param mixed|null $default
      * @param array|null $from
@@ -135,14 +151,6 @@ class ServerRequest extends BaseServerRequest
     protected function isEmpty(array $haystack, $needle): bool
     {
         return !isset($haystack[$needle]) || '' === $haystack[$needle];
-    }
-
-    /**
-     * @return null|Response
-     */
-    public function rawResponse()
-    {
-        return $this->getAttribute('rawResponse');
     }
 
     /**
@@ -179,16 +187,6 @@ class ServerRequest extends BaseServerRequest
             return $session;
         }
         throw new RuntimeException('Сессия недействительна.');
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function CSRFToken(): string
-    {
-        $token = bin2hex(random_bytes(32));
-        $this->session()->set('_token', $token);
-        return $token;
     }
 
 }
