@@ -105,6 +105,14 @@ class Cookie
     }
 
     /**
+     * @return int
+     */
+    public function getMaxAge(): int
+    {
+        return $this->expires !== 0 ? $this->expires - time() : 0;
+    }
+
+    /**
      * @return string
      */
     public function __toString(): string
@@ -137,14 +145,6 @@ class Cookie
     }
 
     /**
-     * @return int
-     */
-    public function getMaxAge(): int
-    {
-        return $this->expires !== 0 ? $this->expires - time() : 0;
-    }
-
-    /**
      * @param string $str
      * @return Cookie
      */
@@ -156,7 +156,7 @@ class Cookie
             'domain' => '',
             'secure' => false,
             'httponly' => false,
-            'samesite' => ''
+            'samesite' => '',
         ];
         foreach (explode(';', $str) as $part) {
             if (!str_contains($part, '=')) {

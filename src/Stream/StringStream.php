@@ -41,7 +41,7 @@ class StringStream implements StreamInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function __toString()
     {
@@ -49,7 +49,7 @@ class StringStream implements StreamInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function close()
     {
@@ -57,7 +57,7 @@ class StringStream implements StreamInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function detach()
     {
@@ -68,7 +68,7 @@ class StringStream implements StreamInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      * @throws Exception
      */
     public function getSize()
@@ -132,7 +132,7 @@ class StringStream implements StreamInterface
      */
     public function write($string)
     {
-        return fwrite($this->stream, $string);
+        return (int)fwrite($this->stream, $string);
     }
 
     /**
@@ -162,7 +162,7 @@ class StringStream implements StreamInterface
 
     /**
      * @param null $key
-     * @return array|mixed|void|null
+     * @return null|array|mixed|void
      */
     public function getMetadata($key = null)
     {

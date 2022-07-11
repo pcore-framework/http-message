@@ -91,7 +91,7 @@ class BaseResponse extends Message implements ResponseInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getStatusCode()
     {
@@ -99,7 +99,7 @@ class BaseResponse extends Message implements ResponseInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function withStatus($code, $reasonPhrase = '')
     {
@@ -113,7 +113,7 @@ class BaseResponse extends Message implements ResponseInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getReasonPhrase()
     {

@@ -32,18 +32,18 @@ class Request extends Message implements RequestInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getRequestTarget()
     {
-        if ('/' === $this->requestTarget) {
+        if ($this->requestTarget === '/') {
             return $this->uri->getPath() . $this->uri->getQuery();
         }
         return '/';
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function withRequestTarget($requestTarget)
     {
@@ -56,7 +56,7 @@ class Request extends Message implements RequestInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getMethod()
     {
@@ -64,7 +64,7 @@ class Request extends Message implements RequestInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function withMethod($method)
     {
@@ -77,7 +77,7 @@ class Request extends Message implements RequestInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getUri()
     {
@@ -85,7 +85,7 @@ class Request extends Message implements RequestInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function withUri(UriInterface $uri, $preserveHost = false)
     {
@@ -93,7 +93,7 @@ class Request extends Message implements RequestInterface
             return $this;
         }
         $new = clone $this;
-        if (true === $preserveHost) {
+        if ($preserveHost === true) {
             $uri = $uri->withHost($this->getHeaderLine('Host'));
         }
         $new->uri = $uri;

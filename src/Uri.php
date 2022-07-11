@@ -65,7 +65,7 @@ class Uri implements UriInterface
      */
     public function __construct(string $uri = '')
     {
-        if ('' !== $uri) {
+        if ($uri !== '') {
             if (false === $parts = parse_url($uri)) {
                 throw new InvalidArgumentException("Невозможно проанализировать URI: {$uri}");
             }
@@ -88,7 +88,7 @@ class Uri implements UriInterface
             if (isset($parts['fragment'])) {
                 $this->fragment = $parts['fragment'];
             }
-            if ('' !== $this->userinfo) {
+            if ($this->userinfo !== '') {
                 $port = ($this->port > 655535 || $this->port < 0) ? '' : $this->getPortString();
                 $this->authority = $this->userinfo . '@' . $this->host . $port;
             }
@@ -168,7 +168,7 @@ class Uri implements UriInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function withScheme($scheme)
     {
@@ -181,7 +181,7 @@ class Uri implements UriInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function withUserInfo($user, $password = null)
     {
@@ -191,7 +191,7 @@ class Uri implements UriInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function withHost($host)
     {
@@ -204,7 +204,7 @@ class Uri implements UriInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function withPort($port)
     {
@@ -217,7 +217,7 @@ class Uri implements UriInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function withPath($path)
     {
@@ -230,7 +230,7 @@ class Uri implements UriInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function withQuery($query)
     {
@@ -243,7 +243,7 @@ class Uri implements UriInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function withFragment($fragment)
     {
@@ -256,12 +256,11 @@ class Uri implements UriInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     protected function getPortString()
     {
-        if (('http' === $this->scheme && 80 === $this->port) ||
-            ('https' === $this->scheme && 443 === $this->port)) {
+        if (($this->scheme === 'http' && $this->port === 80) || ($this->scheme === 'https' && $this->port === 443)) {
             return '';
         }
         return ':' . $this->port;
@@ -278,8 +277,8 @@ class Uri implements UriInterface
             $this->getHost(),
             $this->getPortString(),
             $this->getPath(),
-            ('' === $this->query) ? '' : ('?' . $this->query),
-            ('' === $this->fragment) ? '' : ('#' . $this->fragment),
+            ($this->query === '') ? '' : ('?' . $this->query),
+            ($this->fragment === '') ? '' : ('#' . $this->fragment),
         );
     }
 

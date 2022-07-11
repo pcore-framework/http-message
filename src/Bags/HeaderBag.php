@@ -79,8 +79,7 @@ class HeaderBag extends ParameterBag
         if ($this->has($key)) {
             $uppercaseKey = strtoupper($key);
             $key = $this->map[$uppercaseKey];
-            unset($this->parameters[$key]);
-            unset($this->map[$uppercaseKey]);
+            unset($this->parameters[$key], $this->map[$uppercaseKey]);
         }
     }
 

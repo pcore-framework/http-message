@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace PCore\HttpMessage;
 
+use PCore\HttpMessage\Bags\{CookieBag, FileBag, ParameterBag, ServerBag};
 use PCore\HttpMessage\Stream\StringStream;
 use Psr\Http\Message\{ServerRequestInterface, StreamInterface, UriInterface};
-use PCore\HttpMessage\Bags\{CookieBag, FileBag, ParameterBag, ServerBag};
-
 use function strpos;
 
 /**
@@ -58,11 +57,11 @@ class BaseServerRequest extends Request implements ServerRequestInterface
                 $hasPort = true;
                 $uri = $uri->withPort($hostHeaderParts[1]);
             }
-        } else if (isset($server['server_name'])) {
+        } elseif (isset($server['server_name'])) {
             $uri = $uri->withHost($server['server_name']);
-        } else if (isset($server['server_addr'])) {
+        } elseif (isset($server['server_addr'])) {
             $uri = $uri->withHost($server['server_addr']);
-        } else if (isset($header['host'])) {
+        } elseif (isset($header['host'])) {
             $hasPort = true;
             if (strpos($header['host'], ':')) {
                 [$host, $port] = explode(':', $header['host'], 2);
@@ -138,16 +137,27 @@ class BaseServerRequest extends Request implements ServerRequestInterface
         return $psrRequest;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getServerParams()
+    public static function createFromPsrRequest(ServerRequestInterface $request): static
     {
-        return $this->serverParams;
+        $psrRequest = new static($request->getMethod(), $request->getUri(), $request->getHeaders(), $request->getBody());
+        $psrRequest->serverParams = new ServerBag($request->getServerParams());
+        $psrRequest->cookieParams = new CookieBag($request->getCookieParams());
+        $psrRequest->queryParams = new ParameterBag($request->getQueryParams());
+        $psrRequest->parsedBody = new ParameterBag($_POST);
+        $psrRequest->uploadedFiles = new FileBag($request->getUploadedFiles());
+        return $psrRequest;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
+     */
+    public function getServerParams()
+    {
+        return $this->serverParams->all();
+    }
+
+    /**
+     * {@inheritDoc}
      */
     public function withServerParams(array $serverParams)
     {
@@ -165,7 +175,7 @@ class BaseServerRequest extends Request implements ServerRequestInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function withCookieParams(array $cookies)
     {
@@ -175,7 +185,7 @@ class BaseServerRequest extends Request implements ServerRequestInterface
     }
 
     /**
-     * @return array
+     * {@inheritDoc}
      */
     public function getQueryParams()
     {
@@ -183,7 +193,7 @@ class BaseServerRequest extends Request implements ServerRequestInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function withQueryParams(array $query)
     {
@@ -193,7 +203,7 @@ class BaseServerRequest extends Request implements ServerRequestInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getUploadedFiles()
     {
@@ -201,7 +211,7 @@ class BaseServerRequest extends Request implements ServerRequestInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function withUploadedFiles(array $uploadedFiles)
     {
@@ -211,7 +221,7 @@ class BaseServerRequest extends Request implements ServerRequestInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getParsedBody()
     {
@@ -219,7 +229,7 @@ class BaseServerRequest extends Request implements ServerRequestInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function withParsedBody($data)
     {
@@ -229,7 +239,7 @@ class BaseServerRequest extends Request implements ServerRequestInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getAttributes()
     {
@@ -237,7 +247,7 @@ class BaseServerRequest extends Request implements ServerRequestInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getAttribute($name, $default = null)
     {
@@ -245,7 +255,7 @@ class BaseServerRequest extends Request implements ServerRequestInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function withAttribute($name, $value)
     {
@@ -256,7 +266,7 @@ class BaseServerRequest extends Request implements ServerRequestInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function withoutAttribute($name)
     {

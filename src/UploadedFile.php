@@ -27,7 +27,7 @@ class UploadedFile implements UploadedFileInterface
     ];
 
     /**
-     * @param StreamInterface|null $stream поток файлов
+     * @param null|StreamInterface $stream поток файлов
      * @param int $size размер файла
      * @param string $clientFilename имя файла клиента
      * @param string $clientMediaType тип клиентского носителя
@@ -44,7 +44,7 @@ class UploadedFile implements UploadedFileInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getStream()
     {
@@ -52,7 +52,7 @@ class UploadedFile implements UploadedFileInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      * @return SplFileInfo
      */
     public function moveTo($targetPath)
@@ -69,7 +69,7 @@ class UploadedFile implements UploadedFileInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getSize()
     {
@@ -77,7 +77,7 @@ class UploadedFile implements UploadedFileInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getError()
     {
@@ -85,7 +85,7 @@ class UploadedFile implements UploadedFileInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getClientFilename()
     {
@@ -93,7 +93,7 @@ class UploadedFile implements UploadedFileInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getClientMediaType()
     {

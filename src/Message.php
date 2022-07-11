@@ -21,7 +21,7 @@ class Message implements MessageInterface
     protected ?StreamInterface $body = null;
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getProtocolVersion()
     {
@@ -29,7 +29,7 @@ class Message implements MessageInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function withProtocolVersion($version)
     {
@@ -40,7 +40,7 @@ class Message implements MessageInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getHeaders()
     {
@@ -48,7 +48,7 @@ class Message implements MessageInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function hasHeader($name)
     {
@@ -56,7 +56,7 @@ class Message implements MessageInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getHeader($name)
     {
@@ -64,7 +64,7 @@ class Message implements MessageInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getHeaderLine($name)
     {
@@ -75,7 +75,7 @@ class Message implements MessageInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function withHeader($name, $value)
     {
@@ -86,7 +86,7 @@ class Message implements MessageInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function withAddedHeader($name, $value)
     {
@@ -97,7 +97,7 @@ class Message implements MessageInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function withoutHeader($name)
     {
@@ -108,7 +108,7 @@ class Message implements MessageInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getBody()
     {
@@ -116,7 +116,7 @@ class Message implements MessageInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function withBody(StreamInterface $body)
     {

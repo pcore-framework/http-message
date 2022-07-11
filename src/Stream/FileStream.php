@@ -63,7 +63,7 @@ class FileStream implements StreamInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function __toString()
     {
@@ -71,7 +71,7 @@ class FileStream implements StreamInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function close()
     {
@@ -79,7 +79,7 @@ class FileStream implements StreamInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function detach()
     {
@@ -87,7 +87,7 @@ class FileStream implements StreamInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      * @throws Exception
      */
     public function getSize()
@@ -97,7 +97,7 @@ class FileStream implements StreamInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function tell()
     {
@@ -105,7 +105,7 @@ class FileStream implements StreamInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function eof()
     {
@@ -113,7 +113,7 @@ class FileStream implements StreamInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function isSeekable()
     {
@@ -121,7 +121,7 @@ class FileStream implements StreamInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function seek($offset, $whence = SEEK_SET)
     {
@@ -129,7 +129,7 @@ class FileStream implements StreamInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function rewind()
     {
@@ -137,7 +137,7 @@ class FileStream implements StreamInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function isWritable()
     {
@@ -145,15 +145,15 @@ class FileStream implements StreamInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function write($string)
     {
-        fwrite($this->stream, $string);
+        return (int)fwrite($this->stream, $string);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function isReadable()
     {
@@ -161,7 +161,7 @@ class FileStream implements StreamInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function read($length)
     {
@@ -169,7 +169,7 @@ class FileStream implements StreamInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getContents()
     {
@@ -177,7 +177,7 @@ class FileStream implements StreamInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function getMetadata($key = null)
     {
