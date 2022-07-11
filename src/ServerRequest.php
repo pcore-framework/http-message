@@ -2,10 +2,8 @@
 
 namespace PCore\HttpMessage;
 
-use Exception;
-use PCore\Utils\Arr;
-use Swoole\Http\Response;
 use PCore\Session\Session;
+use PCore\Utils\Arr;
 
 /**
  * Class ServerRequest
@@ -39,7 +37,7 @@ class ServerRequest extends BaseServerRequest
      */
     public function isMethod(string $method): bool
     {
-        return 0 === strcasecmp($this->getMethod(), $method);
+        return strcasecmp($this->getMethod(), $method) === 0;
     }
 
     /**
@@ -64,7 +62,7 @@ class ServerRequest extends BaseServerRequest
      */
     public function isAjax(): bool
     {
-        return 0 === strcasecmp('XMLHttpRequest', $this->getHeaderLine('X-REQUESTED-WITH'));
+        return strcasecmp('XMLHttpRequest', $this->getHeaderLine('X-REQUESTED-WITH')) === 0;
     }
 
     /**
@@ -74,7 +72,7 @@ class ServerRequest extends BaseServerRequest
     public function isPath(string $path): bool
     {
         $requestPath = $this->getUri()->getPath();
-        return 0 === strcasecmp($requestPath, $path) || preg_match("#^{$path}$#iU", $requestPath);
+        return strcasecmp($requestPath, $path) === 0 || preg_match("#^{$path}$#iU", $requestPath);
     }
 
     /**
@@ -86,7 +84,7 @@ class ServerRequest extends BaseServerRequest
     }
 
     /**
-     * @param array|string|null $key
+     * @param null|array|string $key
      * @param mixed|null $default
      * @return mixed
      */
@@ -96,7 +94,7 @@ class ServerRequest extends BaseServerRequest
     }
 
     /**
-     * @param array|string|null $key
+     * @param null|array|string $key
      * @param mixed|null $default
      * @return mixed
      */
@@ -122,7 +120,7 @@ class ServerRequest extends BaseServerRequest
     }
 
     /**
-     * @param array|string|null $key
+     * @param null|array|string $key
      * @param mixed|null $default
      * @param array|null $from
      * @return mixed
@@ -150,7 +148,7 @@ class ServerRequest extends BaseServerRequest
      */
     protected function isEmpty(array $haystack, $needle): bool
     {
-        return !isset($haystack[$needle]) || '' === $haystack[$needle];
+        return !isset($haystack[$needle]) || $haystack[$needle] === '';
     }
 
     /**
