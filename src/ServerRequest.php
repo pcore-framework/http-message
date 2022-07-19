@@ -4,6 +4,7 @@ namespace PCore\HttpMessage;
 
 use PCore\Session\Session;
 use PCore\Utils\Arr;
+use RuntimeException;
 
 /**
  * Class ServerRequest
@@ -185,6 +186,22 @@ class ServerRequest extends BaseServerRequest
             return $session;
         }
         throw new RuntimeException('Сессия недействительна.');
+    }
+
+    /**
+     * @return string
+     */
+    public function getRealIp(): string
+    {
+        $headers = $this->getHeaders();
+        if (isset($headers['x-forwarded-for'][0]) && !empty($headers['x-forwarded-for'][0])) {
+            return $headers['x-forwarded-for'][0];
+        }
+        if (isset($headers['x-real-ip'][0]) && !empty($headers['x-real-ip'][0])) {
+            return $headers['x-real-ip'][0];
+        }
+        $serverParams = $this->getServerParams();
+        return $serverParams['remote_addr'] ?? '';
     }
 
 }
